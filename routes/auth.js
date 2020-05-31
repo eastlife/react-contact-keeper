@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator/check');
 
 const User = require('../models/User');
@@ -10,8 +11,15 @@ const User = require('../models/User');
 // @route       GET api/auth
 // @desc        Get logged in user
 // @access      Private
-router.get('/', (req, res) => {
-    res.send('Get logged in user');
+router.get('/', auth, async (req, res) => { // take auth as the middleware to find if it has token
+    try {
+        // find the user by id in the database and fetch all the informatoin except password
+        const user = await User.findById(req.user.id).select('-password'); // remove password in response
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
 });
 
 // @route       POST api/auth
