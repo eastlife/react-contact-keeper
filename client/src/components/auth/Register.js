@@ -1,10 +1,14 @@
 import React, {useContext, useState} from 'react';
 import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
 const Register = () => {
     const alertContext = useContext(AlertContext);
+    const authContext = useContext(AuthContext);
 
     const { setAlert } = alertContext;
+
+    const { register } = authContext;
 
     const [user, setUser] = useState({
         name: '',
@@ -19,13 +23,22 @@ const Register = () => {
 
     const onSubmit = e => {
         e.preventDefault();
+        let isSuccess = true;
         if (name === '' || email === '' || password === '') {
             setAlert('Please enter all fields', 'danger');
+            isSuccess = false;
         }
         if (password !== password2) {
             setAlert('Passwords do not match', 'danger');
+            isSuccess = false;
         }
-        console.log('Register submit');
+        if (isSuccess) {
+            register({
+                name,
+                email,
+                password
+            });
+        }
     }
     return (
         <div className='form-container'>
